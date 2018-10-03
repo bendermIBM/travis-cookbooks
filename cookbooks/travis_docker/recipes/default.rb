@@ -49,9 +49,9 @@ cookbook_file '/etc/default/grub.d/99-travis-settings.cfg' do
   owner 'root'
   group 'root'
   mode 0o640
-  not_if { node['kernel']['machine'] == 'ppc64le' }
+  not_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x' }
 end
 
 execute 'update-grub' do
-  only_if { node['travis_docker']['update_grub'] }
+  only_if { node['travis_docker']['update_grub'] && ! node['kernel']['machine'] == 's390x' }
 end
