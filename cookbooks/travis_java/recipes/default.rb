@@ -1,7 +1,7 @@
 default_jvm = nil
 default_java_version = node['travis_java']['default_version']
 
-if node['kernel']['machine'] == 'ppc64le'
+if node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'
   if default_java_version =~ /oraclejdk/ || default_java_version == 'openjdk6'
     default_java_version = ''
   end

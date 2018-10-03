@@ -14,10 +14,10 @@ end
 
 packagecloud_repo 'github/git-lfs' do
   type 'deb'
-  not_if { node['kernel']['machine'] == 'ppc64le' }
+  not_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x' }
 end
 
 package 'git-lfs' do
   action %i[install upgrade]
-  not_if { node['kernel']['machine'] == 'ppc64le' }
+  not_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x' }
 end

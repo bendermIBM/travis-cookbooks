@@ -26,7 +26,7 @@ end
 
 package 'python-docutils' do
   action %i[install upgrade]
-  only_if { node['kernel']['machine'] == 'ppc64le' }
+  only_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x' }
 end
 
 ark 'mercurial' do
@@ -35,5 +35,5 @@ ark 'mercurial' do
   make_opts ['all']
   action :install_with_make
   only_if { node['travis_build_environment']['mercurial_install_type'] == 'src' }
-  only_if { node['kernel']['machine'] == 'ppc64le' }
+  only_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x' }
 end

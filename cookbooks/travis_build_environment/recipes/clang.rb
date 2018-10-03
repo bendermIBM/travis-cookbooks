@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-if node['kernel']['machine'] == 'ppc64le'
+if node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'
   package 'clang'
 else
   include_recipe 'travis_build_environment::clang_tarball'

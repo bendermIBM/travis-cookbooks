@@ -27,6 +27,8 @@ bits = case node['kernel']['machine']
          64
        when 'ppc64le'
          'ppc64le'
+       when 's390x'
+         's390x'
        else
          32
        end

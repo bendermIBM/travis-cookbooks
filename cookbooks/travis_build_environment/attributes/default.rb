@@ -176,6 +176,10 @@ if node['kernel']['machine'] =~ /x86_64/
   default['travis_build_environment']['arch'] = 'amd64'
 end
 
+if node['kernel']['machine'] =~ /s390x/
+  default['travis_build_environment']['arch'] = 's390x'
+end
+
 default['travis_build_environment']['jq_install_dest'] = '/usr/local/bin/jq'
 
 default['travis_build_environment']['sphinxsearch']['ppas'] = %w[
@@ -255,7 +259,7 @@ default['travis_build_environment']['neo4j_version'] = '3.2.7'
 default['travis_build_environment']['neo4j_checksum'] = '7f347196a1f2026f8daa9ee045d3fbb404d961dd81b3a8363132aaaf60cf316f'
 
 default['travis_build_environment']['mercurial_install_type'] = 'ppa'
-if node['kernel']['machine'] == 'ppc64le'
+if node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'
   default['travis_build_environment']['mercurial_install_type'] = 'src'
 end
 default['travis_build_environment']['mercurial_version'] = '4.2.2~trusty1'

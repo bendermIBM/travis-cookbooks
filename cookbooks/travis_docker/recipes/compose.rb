@@ -22,7 +22,7 @@
 
 package 'docker-compose' do
   action %i[install upgrade]
-  only_if { node['kernel']['machine'] == 'ppc64le' }
+  only_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'}
   only_if { node['lsb']['codename'] == 'xenial' }
 end
 
@@ -31,7 +31,7 @@ link '/usr/local/bin/docker-compose' do
   owner 'root'
   group 'root'
   mode 0o755
-  only_if { node['kernel']['machine'] == 'ppc64le' }
+  only_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'}
   only_if { node['lsb']['codename'] == 'xenial' }
 end
 
@@ -41,5 +41,5 @@ remote_file '/usr/local/bin/docker-compose' do
   owner 'root'
   group 'root'
   mode 0o755
-  not_if { node['kernel']['machine'] == 'ppc64le' }
+  not_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'}
 end
