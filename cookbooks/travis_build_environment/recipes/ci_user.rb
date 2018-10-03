@@ -233,56 +233,56 @@ bash "set default elixir version to #{node['travis_build_environment']['default_
   not_if { node['travis_build_environment']['default_elixir_version'].empty? }
 end
 
-unless Array(node['travis_build_environment']['php_packages']).empty?
-  package Array(node['travis_build_environment']['php_packages'])
-end
+# unless Array(node['travis_build_environment']['php_packages']).empty?
+#   package Array(node['travis_build_environment']['php_packages'])
+# end
 
-unless Array(node['travis_build_environment']['php_versions']).empty?
-  include_recipe 'travis_phpenv'
-end
+# unless Array(node['travis_build_environment']['php_versions']).empty?
+#   include_recipe 'travis_phpenv'
+# end
 
-phpenv_path = "#{node['travis_build_environment']['home']}/.phpenv"
+# phpenv_path = "#{node['travis_build_environment']['home']}/.phpenv"
 
-Array(node['travis_build_environment']['php_versions']).each do |php_version|
-  local_archive = ::File.join(
-    Chef::Config[:file_cache_path],
-    "php-#{php_version}.tar.bz2"
-  )
+# Array(node['travis_build_environment']['php_versions']).each do |php_version|
+#   local_archive = ::File.join(
+#     Chef::Config[:file_cache_path],
+#     "php-#{php_version}.tar.bz2"
+#   )
 
-  remote_file local_archive do
-    source ::File.join(
-      'https://s3.amazonaws.com/travis-php-archives/binaries',
-      node['platform'],
-      node['platform_version'],
-      node['kernel']['machine'],
-      ::File.basename(local_archive)
-    )
-    not_if { ::File.exist?(local_archive) }
-  end
+#   remote_file local_archive do
+#     source ::File.join(
+#       'https://s3.amazonaws.com/travis-php-archives/binaries',
+#       node['platform'],
+#       node['platform_version'],
+#       node['kernel']['machine'],
+#       ::File.basename(local_archive)
+#     )
+#     not_if { ::File.exist?(local_archive) }
+#   end
 
-  bash "Expand PHP #{php_version} archive" do
-    user node['travis_build_environment']['user']
-    group node['travis_build_environment']['group']
-    code "tar -xjf #{local_archive.inspect} --directory /"
-  end
+#   bash "Expand PHP #{php_version} archive" do
+#     user node['travis_build_environment']['user']
+#     group node['travis_build_environment']['group']
+#     code "tar -xjf #{local_archive.inspect} --directory /"
+#   end
 
-  link "#{phpenv_path}/versions/#{php_version}/bin/php-fpm" do
-    to "#{phpenv_path}/versions/#{php_version}/sbin/php-fpm"
-    not_if do
-      ::File.exist?("#{phpenv_path}/versions/#{php_version}/sbin/php-fpm")
-    end
-  end
-end
+#   link "#{phpenv_path}/versions/#{php_version}/bin/php-fpm" do
+#     to "#{phpenv_path}/versions/#{php_version}/sbin/php-fpm"
+#     not_if do
+#       ::File.exist?("#{phpenv_path}/versions/#{php_version}/sbin/php-fpm")
+#     end
+#   end
+# end
 
-node['travis_build_environment']['php_aliases'].each do |short_version, target_version|
-  link "#{phpenv_path}/versions/#{short_version}" do
-    to "#{phpenv_path}/versions/#{target_version}"
-    not_if do
-      Array(node['travis_build_environment']['php_versions']).empty? ||
-        ::File.exist?("#{phpenv_path}/versions/#{target_version}")
-    end
-  end
-end
+# node['travis_build_environment']['php_aliases'].each do |short_version, target_version|
+#   link "#{phpenv_path}/versions/#{short_version}" do
+#     to "#{phpenv_path}/versions/#{target_version}"
+#     not_if do
+#       Array(node['travis_build_environment']['php_versions']).empty? ||
+#         ::File.exist?("#{phpenv_path}/versions/#{target_version}")
+#     end
+#   end
+# end
 
 include_recipe 'travis_build_environment::hhvm' if \
   node['travis_build_environment']['hhvm_enabled']
