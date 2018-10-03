@@ -7,7 +7,7 @@ apt_repository 'hhvm-repository' do
   key '0xB4112585D386EB94'
   retries 2
   retry_delay 30
-  not_if { node['kernel']['machine'] == 'ppc64le' }
+  not_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'}
 end
 
 apt_repository 'hhvm-ppc-repository' do
@@ -17,7 +17,7 @@ apt_repository 'hhvm-ppc-repository' do
   key 'E7D1FA0C'
   retries 2
   retry_delay 30
-  only_if { node['kernel']['machine'] == 'ppc64le' }
+  only_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x' }
 end
 
 package node['travis_build_environment']['hhvm_package_name'] do
