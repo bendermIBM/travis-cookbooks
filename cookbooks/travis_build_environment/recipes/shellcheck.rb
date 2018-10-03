@@ -1,11 +1,11 @@
 package 'shellcheck' do
   action %i[install upgrade]
-  only_if { node['kernel']['machine'] == 'ppc64le'}
+  only_if { node['kernel']['machine'] == 'ppc64le'  || node['kernel']['machine'] == 's390x' }
 end
 
 link '/usr/local/bin/shellcheck' do
   to '/usr/bin/shellcheck'
-  only_if { node['kernel']['machine'] == 'ppc64le'}
+  only_if { node['kernel']['machine'] == 'ppc64le'  || node['kernel']['machine'] == 's390x' }
 end
 
 ark 'shellcheck' do
