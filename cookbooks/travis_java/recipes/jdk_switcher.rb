@@ -12,13 +12,27 @@ remote_file node['travis_java']['jdk_switcher_path'] do
   mode 0o644
 end
 
-ruby_block "Edit jdk_switcher" do
-  block do
-    require 'chef/util/file_edit'
-    nc = Chef::Util::FileEdit.new(node['travis_java']['jdk_switcher_path'])
-    nc.insert_line_after_match(/ARCH_SUFFIX=amd64/, "elif uname -a | grep ppc64le >/dev/null; then \n   ARCH_SUFFIX=ppc64el")
-    nc.write_file
+
+if node['kernel']['machine'] == 'ppc64le'
+  ruby_block "Edit jdk_switcher" do
+    block do
+      require 'chef/util/file_edit'
+      nc = Chef::Util::FileEdit.new(node['travis_java']['jdk_switcher_path'])
+      nc.insert_line_after_match(/ARCH_SUFFIX=amd64/, "elif uname -a | grep ppc64le >/dev/null; then \n   ARCH_SUFFIX=ppc64el")
+      nc.write_file
+    end
+    not_if { ::File.readlines(node['travis_java']['jdk_switcher_path']).grep(/ppc64el/).any? }
   end
-  not_if { ::File.readlines(node['travis_java']['jdk_switcher_path']).grep(/ppc64el/).any? }
-  only_if { node['kernel']['machine'] == 'ppc64le' }
+end
+
+if node['kernel']['machine'] == 's390x'
+  ruby_block "Edit jdk_switcher" do
+    block do
+      require 'chef/util/file_edit'
+      nc = Chef::Util::FileEdit.new(node['travis_java']['jdk_switcher_path'])
+      nc.insert_line_after_match(/ARCH_SUFFIX=amd64/, "elif uname -a | grep s390x >/dev/null; then \n   ARCH_SUFFIX=s390x")
+      nc.write_file
+    end
+    not_if { ::File.readlines(node['travis_java']['jdk_switcher_path']).grep(/s390x/).any? }
+  end
 end

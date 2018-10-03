@@ -20,20 +20,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-apt_repository 'heroku-toolbelt' do
-  uri 'http://toolbelt.heroku.com/ubuntu'
-  distribution ''
-  components %w[./]
-  key 'https://toolbelt.heroku.com/apt/release.key'
-  retries 2
-  retry_delay 30
-end
+if ! node['kernel']['machine'] == 's390x'
+  apt_repository 'heroku-toolbelt' do
+    uri 'http://toolbelt.heroku.com/ubuntu'
+    distribution ''
+    components %w[./]
+    key 'https://toolbelt.heroku.com/apt/release.key'
+    retries 2
+    retry_delay 30
+  end
 
-package 'heroku-toolbelt'
+  package 'heroku-toolbelt'
 
-execute 'heroku version' do
-  user node['travis_build_environment']['user']
-  environment(
-    'HOME' => node['travis_build_environment']['home']
-  )
+  execute 'heroku version' do
+    user node['travis_build_environment']['user']
+    environment(
+      'HOME' => node['travis_build_environment']['home']
+    )
+  end
 end
