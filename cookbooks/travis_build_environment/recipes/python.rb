@@ -57,105 +57,106 @@ build_environment = {
     -Werror=format-security
   ].join(' ')
 }
-
-node['travis_build_environment']['pythons'].each do |py|
-  pyname = py
-  downloaded_tarball = ::File.join(
-    Chef::Config[:file_cache_path], "#{py}.tar.bz2"
-  )
-
-  if /^\d+\.\d+(?:\.\d+)?(?:-dev)?$/ =~ py
-    pyname = "python#{py}"
+if node['kernel']['machine'] != 's390x'
+  node['travis_build_environment']['pythons'].each do |py|
+    pyname = py
     downloaded_tarball = ::File.join(
-      Chef::Config[:file_cache_path], "python-#{py}.tar.bz2"
+      Chef::Config[:file_cache_path], "#{py}.tar.bz2"
     )
-  end
 
-  venv_fullname = "#{virtualenv_root}/#{pyname}"
-
-  remote_file downloaded_tarball do
-    source ::File.join(
-      'https://s3.amazonaws.com/travis-python-archives/binaries',
-      node['platform'],
-      node['platform_version'],
-      node['kernel']['machine'],
-      ::File.basename(downloaded_tarball)
-    )
-    owner 'root'
-    group 'root'
-    mode 0o644
-    ignore_failure true
-  end
-
-  bash "extract #{downloaded_tarball}" do
-    code "tar -xjf #{downloaded_tarball} --directory /"
-    creates "/opt/python/#{py}"
-    environment build_environment
-    only_if { File.exist?(downloaded_tarball) }
-  end
-
-  bash "build #{py}" do
-    code "python-build #{py} /opt/python/#{py}"
-    creates "/opt/python/#{py}"
-    environment build_environment
-    not_if { File.exist?("/opt/python/#{py}") }
-  end
-
-  link "/opt/python/#{py}/bin/#{pyname}" do
-    to "/opt/python/#{py}/bin/python"
-    owner node['travis_build_environment']['user']
-    group node['travis_build_environment']['group']
-  end
-
-  bash "create virtualenv at #{venv_fullname} from #{py}" do
-    code "virtualenv --python=/opt/python/#{py}/bin/python #{venv_fullname}"
-    user node['travis_build_environment']['user']
-    group node['travis_build_environment']['group']
-  end
-
-  node['travis_build_environment']['python_aliases'].fetch(py, []).each do |pyalias|
     if /^\d+\.\d+(?:\.\d+)?(?:-dev)?$/ =~ py
-      pyaliasname = "python#{pyalias}"
-    else
-      pyaliasname = pyalias
+      pyname = "python#{py}"
+      downloaded_tarball = ::File.join(
+        Chef::Config[:file_cache_path], "python-#{py}.tar.bz2"
+      )
     end
 
-    link "#{virtualenv_root}/#{pyaliasname}" do
-      to venv_fullname
+    venv_fullname = "#{virtualenv_root}/#{pyname}"
+
+    remote_file downloaded_tarball do
+      source ::File.join(
+        'https://s3.amazonaws.com/travis-python-archives/binaries',
+        node['platform'],
+        node['platform_version'],
+        node['kernel']['machine'],
+        ::File.basename(downloaded_tarball)
+      )
+      owner 'root'
+      group 'root'
+      mode 0o644
+      ignore_failure true
+    end
+
+    bash "extract #{downloaded_tarball}" do
+      code "tar -xjf #{downloaded_tarball} --directory /"
+      creates "/opt/python/#{py}"
+      environment build_environment
+      only_if { File.exist?(downloaded_tarball) }
+    end
+
+    bash "build #{py}" do
+      code "python-build #{py} /opt/python/#{py}"
+      creates "/opt/python/#{py}"
+      environment build_environment
+      not_if { File.exist?("/opt/python/#{py}") }
+    end
+
+    link "/opt/python/#{py}/bin/#{pyname}" do
+      to "/opt/python/#{py}/bin/python"
       owner node['travis_build_environment']['user']
       group node['travis_build_environment']['group']
     end
-  end
 
-  if py =~ /^pypy3/
-    link "/opt/python/#{py}/bin/pypy3" do
-      to "/opt/python/#{py}/bin/#{py}"
-      not_if "test -f /opt/python/#{py}/bin/pypy3"
+    bash "create virtualenv at #{venv_fullname} from #{py}" do
+      code "virtualenv --python=/opt/python/#{py}/bin/python #{venv_fullname}"
+      user node['travis_build_environment']['user']
+      group node['travis_build_environment']['group']
     end
-  end
 
-  packages = []
+    node['travis_build_environment']['python_aliases'].fetch(py, []).each do |pyalias|
+      if /^\d+\.\d+(?:\.\d+)?(?:-dev)?$/ =~ py
+        pyaliasname = "python#{pyalias}"
+      else
+        pyaliasname = pyalias
+      end
 
-  node['travis_build_environment']['python_aliases'].fetch(py, []).concat(['default', py]).each do |name|
-    packages.concat(node['travis_build_environment']['pip']['packages'].fetch(name, []))
-  end
+      link "#{virtualenv_root}/#{pyaliasname}" do
+        to venv_fullname
+        owner node['travis_build_environment']['user']
+        group node['travis_build_environment']['group']
+      end
+    end
 
-  execute "install wheel in #{py}" do
-    command "#{venv_fullname}/bin/pip install --upgrade wheel"
-    user node['travis_build_environment']['user']
-    group node['travis_build_environment']['group']
-    environment(
-      'HOME' => node['travis_build_environment']['home']
-    )
-  end
+    if py =~ /^pypy3/
+      link "/opt/python/#{py}/bin/pypy3" do
+        to "/opt/python/#{py}/bin/#{py}"
+        not_if "test -f /opt/python/#{py}/bin/pypy3"
+      end
+    end
 
-  execute "install packages in #{py}" do
-    command "#{venv_fullname}/bin/pip install --upgrade #{packages.join(' ')}"
-    user node['travis_build_environment']['user']
-    group node['travis_build_environment']['group']
-    environment(
-      'HOME' => node['travis_build_environment']['home']
-    )
+    packages = []
+
+    node['travis_build_environment']['python_aliases'].fetch(py, []).concat(['default', py]).each do |name|
+      packages.concat(node['travis_build_environment']['pip']['packages'].fetch(name, []))
+    end
+
+    execute "install wheel in #{py}" do
+      command "#{venv_fullname}/bin/pip install --upgrade wheel"
+      user node['travis_build_environment']['user']
+      group node['travis_build_environment']['group']
+      environment(
+        'HOME' => node['travis_build_environment']['home']
+      )
+    end
+
+    execute "install packages in #{py}" do
+      command "#{venv_fullname}/bin/pip install --upgrade #{packages.join(' ')}"
+      user node['travis_build_environment']['user']
+      group node['travis_build_environment']['group']
+      environment(
+        'HOME' => node['travis_build_environment']['home']
+      )
+    end
   end
 end
 
