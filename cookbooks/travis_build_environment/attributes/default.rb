@@ -1,4 +1,4 @@
-default['travis_build_environment']['user'] = 'travis'
+default['travis_build_environment']['user'] = 'ubuntu'
 default['travis_build_environment']['group'] = node['travis_build_environment']['user']
 default['travis_build_environment']['home'] = "/home/#{node['travis_build_environment']['user']}"
 default['travis_build_environment']['user_comment'] = 'Travis CI User'
