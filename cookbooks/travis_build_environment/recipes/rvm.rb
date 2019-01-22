@@ -43,6 +43,7 @@ package %w[
   sqlite3
   zlib1g
   zlib1g-dev
+  dirmngr
 ] do
   action %i[install upgrade]
 end
