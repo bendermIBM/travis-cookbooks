@@ -54,10 +54,7 @@ end
 
 execute 'rm -rf /etc/update-motd.d/*'
 
-if node['kernel']['machine'] != 's390x'
-  include_recipe 'travis_build_environment::rvm'
-end
-
+include_recipe 'travis_build_environment::rvm'
 include_recipe 'travis_build_environment::git'
 include_recipe 'travis_build_environment::timezone'
 include_recipe 'travis_build_environment::gimme'
