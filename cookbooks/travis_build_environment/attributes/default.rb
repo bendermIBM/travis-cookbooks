@@ -39,7 +39,7 @@ default['travis_build_environment']['language_codes'] = %w[
   zh_TW
 ].map { |l| "#{l}.UTF-8" }
 default['travis_build_environment']['rubies'] = %w[2.2.7 2.4.1]
-default['travis_build_environment']['default_ruby'] = '2.2.7'
+default['travis_build_environment']['default_ruby'] = '2.4.5'
 default['travis_build_environment']['gems'] = {}
 default['travis_build_environment']['global_gems'] = %w[
   bundler
