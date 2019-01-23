@@ -112,7 +112,7 @@ bash 'run rvm installer' do
 end
 
 install_flag = "--autolibs=disable --binary --fuzzy"
-if node['kernel']['machine'] == "ppc64le"
+if node['kernel']['machine'] == "ppc64le" || node['kernel']['machine'] == "s390x" 
   install_flag = "--autolibs=disable --fuzzy"
 end
 
