@@ -57,9 +57,20 @@ build_environment = {
     -Werror=format-security
   ].join(' ')
 }
-if node['kernel']['machine'] != 's390x'
-  node['travis_build_environment']['pythons'].each do |py|
-    pyname = py
+
+node['travis_build_environment']['pythons'].each do |py|
+  pyname = py
+
+  if node['kernel']['machine'] == "s390x"
+
+    bash "pyenv install #{py}" do
+      code "#{pyenv_root}/bin/pyenv install #{py}"
+      user node['travis_build_environment']['user']
+      group node['travis_build_environment']['group']
+      environment build_environment
+    end
+
+  else
     downloaded_tarball = ::File.join(
       Chef::Config[:file_cache_path], "#{py}.tar.bz2"
     )
@@ -73,6 +84,7 @@ if node['kernel']['machine'] != 's390x'
 
     venv_fullname = "#{virtualenv_root}/#{pyname}"
 
+    
     remote_file downloaded_tarball do
       source ::File.join(
         'https://s3.amazonaws.com/travis-python-archives/binaries',
