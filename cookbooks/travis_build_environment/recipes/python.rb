@@ -55,7 +55,8 @@ build_environment = {
     --param=ssp-buffer-size=4
     -Wformat
     -Werror=format-security
-  ].join(' ')
+  ].join(' '),
+  'HOME' => ::Dir.home(node['travis_build_environment']['user'])
 }
 
 node['travis_build_environment']['pythons'].each do |py|
