@@ -18,7 +18,11 @@ package %w[
   zlib1g-dev
 ]
 
-pyenv_root = '/opt/pyenv'
+if node['kernel']['machine'] == "s390x"
+  pyenv_root= "#{node['travis_build_environment']['home']}/.pyenv"
+else
+  pyenv_root = '/opt/pyenv'
+end
 
 git pyenv_root do
   repository 'https://github.com/pyenv/pyenv.git'
