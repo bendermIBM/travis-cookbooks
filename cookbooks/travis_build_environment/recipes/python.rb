@@ -20,17 +20,25 @@ package %w[
 
 if node['kernel']['machine'] == "s390x"
   pyenv_root= "#{node['travis_build_environment']['home']}/.pyenv"
+
+  git pyenv_root do
+    repository 'https://github.com/pyenv/pyenv.git'
+    revision node['travis_build_environment']['pyenv_revision']
+    action :sync
+    user node['travis_build_environment']['user']
+    group node['travis_build_environment']['group']
+  end
 else
   pyenv_root = '/opt/pyenv'
+
+  git pyenv_root do
+    repository 'https://github.com/pyenv/pyenv.git'
+    revision node['travis_build_environment']['pyenv_revision']
+    action :sync
+  end
 end
 
-git pyenv_root do
-  repository 'https://github.com/pyenv/pyenv.git'
-  revision node['travis_build_environment']['pyenv_revision']
-  action :sync
-  user node['travis_build_environment']['user']
-  group node['travis_build_environment']['group']
-end
+
 
 execute "#{pyenv_root}/plugins/python-build/install.sh"
 
