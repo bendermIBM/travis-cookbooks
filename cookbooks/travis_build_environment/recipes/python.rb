@@ -94,6 +94,11 @@ node['travis_build_environment']['pythons'].each do |py|
       environment build_environment
     end
 
+    directory "/opt/python/#{py}/bin/" do
+      owner node['travis_build_environment']['user']
+      group node['travis_build_environment']['group']
+    end
+
     link "#{pyenv_root}/versions/#{py}/bin/python" do
       to "/opt/python/#{py}/bin/python"
       owner node['travis_build_environment']['user']
