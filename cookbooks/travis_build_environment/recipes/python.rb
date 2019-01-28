@@ -28,6 +28,8 @@ git pyenv_root do
   repository 'https://github.com/pyenv/pyenv.git'
   revision node['travis_build_environment']['pyenv_revision']
   action :sync
+  user node['travis_build_environment']['user']
+  group node['travis_build_environment']['group']
 end
 
 execute "#{pyenv_root}/plugins/python-build/install.sh"
