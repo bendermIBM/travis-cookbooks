@@ -88,7 +88,7 @@ node['travis_build_environment']['pythons'].each do |py|
   if node['kernel']['machine'] == "s390x"
 
     bash "pyenv install #{py}" do
-      code "#{pyenv_root}/bin/pyenv install #{py}"
+      code "#{pyenv_root}/bin/pyenv install -s #{py}"
       user node['travis_build_environment']['user']
       group node['travis_build_environment']['group']
       environment build_environment
