@@ -100,8 +100,8 @@ node['travis_build_environment']['pythons'].each do |py|
       recursive true
     end
 
-    link "/opt/python/#{py}/bin/python" do
-      to "#{pyenv_root}/versions/#{py}/bin/python"
+    link "#{pyenv_root}/versions/#{py}/bin/python" do
+      to "/opt/python/#{py}/bin/python"
       owner node['travis_build_environment']['user']
       group node['travis_build_environment']['group']
     end
