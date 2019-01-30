@@ -225,10 +225,13 @@ node['travis_build_environment']['pythons'].each do |py|
   end
 end
 
-link "#{pyenv_root}/versions" do
-  to '/opt/python'
-  owner node['travis_build_environment']['user']
-  group node['travis_build_environment']['group']
+if node['kernel']['machine'] != "s390x"
+
+  link "#{pyenv_root}/versions" do
+    to '/opt/python'
+    owner node['travis_build_environment']['user']
+    group node['travis_build_environment']['group']
+  end
 end
 
 include_recipe 'travis_build_environment::bash_profile_d'
