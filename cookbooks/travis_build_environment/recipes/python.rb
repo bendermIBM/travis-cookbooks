@@ -226,7 +226,7 @@ node['travis_build_environment']['pythons'].each do |py|
 end
 
 if node['kernel']['machine'] != "s390x"
-  
+
   link "#{pyenv_root}/versions" do
     to '/opt/python'
     owner node['travis_build_environment']['user']

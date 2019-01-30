@@ -23,6 +23,7 @@ default['travis_java']['jvm_base_dir'] = '/usr/lib/jvm'
 default['travis_java']['openjdk6']['jvm_name'] = "java-1.6.0-openjdk-#{node['travis_java']['arch']}"
 default['travis_java']['openjdk7']['jvm_name'] = "java-1.7.0-openjdk-#{node['travis_java']['arch']}"
 default['travis_java']['openjdk8']['jvm_name'] = "java-1.8.0-openjdk-#{node['travis_java']['arch']}"
+default['travis_java']['openjdk9']['jvm_name'] = "java-1.9.0-openjdk-#{node['travis_java']['arch']}"
 
 default['travis_java']['oraclejdk7']['install_jce_unlimited'] = true
 default['travis_java']['oraclejdk7']['jvm_name'] = 'java-7-oracle'
