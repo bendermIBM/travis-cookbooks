@@ -1,7 +1,7 @@
 if node['kernel']['machine'] == 'ppc64le' && node['lsb']['codename'] == 'xenial'
   include_recipe 'travis_java::openjdk-r'
   package 'openjdk-7-jdk'
-elsif node['kernel']['machine'] == 'ppc64le' && node['lsb']['codename'] == 'xenial'
+elsif node['kernel']['machine'] == 's390x' && node['lsb']['codename'] == 'xenial'
   include_recipe 'travis_java::openjdk-r'
   package 'openjdk-7-jdk'
 else

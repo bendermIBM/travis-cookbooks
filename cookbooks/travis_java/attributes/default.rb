@@ -7,8 +7,13 @@ default['travis_java']['arch'] = 's390x' if node['kernel']['machine'] =~ /s390x/
 
 default['travis_java']['alternate_versions'] = []
 default['travis_java']['default_version'] = 'oraclejdk8'
-if node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'
+
+if node['kernel']['machine'] == 'ppc64le'
   default['travis_java']['default_version'] = 'openjdk8'
+end
+  
+if node['kernel']['machine'] == 's390x'
+  default['travis_java']['default_version'] = 'openjdk9'
 end
 
 default['travis_java']['jdk_switcher_url'] = 'https://raw.githubusercontent.com/michaelklishin/jdk_switcher/1e091549285fb0f2591cef679b4135cfbfcc0b4c/jdk_switcher.sh'
