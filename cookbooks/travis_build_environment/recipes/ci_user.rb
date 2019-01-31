@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 # Cookbook Name:: travis_build_environment
 # Recipe:: ci_user
-# Copyright 2017 Travis CI GmbH
+# Copyright 2018 Travis CI GmbH
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +22,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'json'
+require 'net/http'
+require 'openssl'
 require 'pathname'
+
+def obtain_nvm_url
+  http = Net::HTTP.new('api.github.com', 443)
+  http.use_ssl = true
+  http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+  request = Net::HTTP::Get.new('/repos/creationix/nvm/releases/latest')
+  request['Accept'] = 'application/json'
+  token = node&.[]('travis_packer_build')&.[]('github_token')
+  request['Authorization'] = "token #{token}" if token
+  response = http.request(request)
+  tag = JSON.parse(response.body).fetch('tag_name')
+  "https://raw.githubusercontent.com/creationix/nvm/#{tag}/nvm.sh"
+end
 
 home = Pathname.new(node['travis_build_environment']['home'])
 
@@ -125,7 +143,8 @@ Array(node['travis_build_environment']['otp_releases']).each do |rel|
       node['kernel']['machine'],
       ::File.basename(local_archive)
     )
-
+    retries 2
+    retry_delay 10
     user node['travis_build_environment']['user']
     group node['travis_build_environment']['group']
 
@@ -192,10 +211,12 @@ Array(node['travis_build_environment']['elixir_versions']).each do |elixir|
   dest = "#{node['travis_build_environment']['home']}/.kiex/elixirs/elixir-#{elixir}"
 
   remote_file local_archive do
-    source "http://s3.hex.pm/builds/elixir/v#{elixir}.zip"
+    source "https://github.com/elixir-lang/elixir/releases/download/v#{elixir}/Precompiled.zip"
     user node['travis_build_environment']['user']
     group node['travis_build_environment']['group']
     mode 0o644
+    retries 2
+    retry_delay 10
   end
 
   bash "unpack #{local_archive}" do
@@ -233,71 +254,74 @@ bash "set default elixir version to #{node['travis_build_environment']['default_
   not_if { node['travis_build_environment']['default_elixir_version'].empty? }
 end
 
-# unless Array(node['travis_build_environment']['php_packages']).empty?
-#   package Array(node['travis_build_environment']['php_packages'])
-# end
+if node['kernel']['machine'] != 's390x':
+  unless Array(node['travis_build_environment']['php_packages']).empty?
+    package Array(node['travis_build_environment']['php_packages'])
+  end
 
-# unless Array(node['travis_build_environment']['php_versions']).empty?
-#   include_recipe 'travis_phpenv'
-# end
+  unless Array(node['travis_build_environment']['php_versions']).empty?
+    include_recipe 'travis_phpenv'
+  end
 
-# phpenv_path = "#{node['travis_build_environment']['home']}/.phpenv"
+  phpenv_path = "#{node['travis_build_environment']['home']}/.phpenv"
 
-# Array(node['travis_build_environment']['php_versions']).each do |php_version|
-#   local_archive = ::File.join(
-#     Chef::Config[:file_cache_path],
-#     "php-#{php_version}.tar.bz2"
-#   )
+  Array(node['travis_build_environment']['php_versions']).each do |php_version|
+    local_archive = ::File.join(
+      Chef::Config[:file_cache_path],
+      "php-#{php_version}.tar.bz2"
+    )
 
-#   remote_file local_archive do
-#     source ::File.join(
-#       'https://s3.amazonaws.com/travis-php-archives/binaries',
-#       node['platform'],
-#       node['platform_version'],
-#       node['kernel']['machine'],
-#       ::File.basename(local_archive)
-#     )
-#     not_if { ::File.exist?(local_archive) }
-#   end
+    remote_file local_archive do
+      source ::File.join(
+        'https://s3.amazonaws.com/travis-php-archives/binaries',
+        node['platform'],
+        node['platform_version'],
+        node['kernel']['machine'],
+        ::File.basename(local_archive)
+      )
+      retries 2
+      retry_delay 10
+      not_if { ::File.exist?(local_archive) }
+    end
 
-#   bash "Expand PHP #{php_version} archive" do
-#     user node['travis_build_environment']['user']
-#     group node['travis_build_environment']['group']
-#     code "tar -xjf #{local_archive.inspect} --directory /"
-#   end
+    bash "Expand PHP #{php_version} archive" do
+      user node['travis_build_environment']['user']
+      group node['travis_build_environment']['group']
+      code "tar -xjf #{local_archive.inspect} --directory /"
+    end
 
-#   link "#{phpenv_path}/versions/#{php_version}/bin/php-fpm" do
-#     to "#{phpenv_path}/versions/#{php_version}/sbin/php-fpm"
-#     not_if do
-#       ::File.exist?("#{phpenv_path}/versions/#{php_version}/sbin/php-fpm")
-#     end
-#   end
-# end
+    link "#{phpenv_path}/versions/#{php_version}/bin/php-fpm" do
+      to "#{phpenv_path}/versions/#{php_version}/sbin/php-fpm"
+      not_if do
+        ::File.exist?("#{phpenv_path}/versions/#{php_version}/sbin/php-fpm")
+      end
+    end
+  end
 
-# node['travis_build_environment']['php_aliases'].each do |short_version, target_version|
-#   link "#{phpenv_path}/versions/#{short_version}" do
-#     to "#{phpenv_path}/versions/#{target_version}"
-#     not_if do
-#       Array(node['travis_build_environment']['php_versions']).empty? ||
-#         ::File.exist?("#{phpenv_path}/versions/#{target_version}")
-#     end
-#   end
-# end
+  node['travis_build_environment']['php_aliases'].each do |short_version, target_version|
+    link "#{phpenv_path}/versions/#{short_version}" do
+      to "#{phpenv_path}/versions/#{target_version}"
+      not_if do
+        Array(node['travis_build_environment']['php_versions']).empty? ||
+          ::File.exist?("#{phpenv_path}/versions/#{target_version}")
+      end
+    end
+  end
 
-# include_recipe 'travis_build_environment::hhvm' if \
-#   node['travis_build_environment']['hhvm_enabled']
+  include_recipe 'travis_build_environment::hhvm'
 
-# bash 'set global default php' do
-#   # NOTE: It is important that this happens *after* the conditional inclusion of
-#   # the travis_build_environment::hhvm recipe just above so that the default php
-#   # version is not hhvm.
-#   code "phpenv global #{node['travis_build_environment']['php_default_version']}"
-#   user node['travis_build_environment']['user']
-#   group node['travis_build_environment']['group']
-#   flags '-l'
-#   environment('HOME' => node['travis_build_environment']['home'])
-#   not_if { Array(node['travis_build_environment']['php_versions']).empty? }
-# end
+  bash 'set global default php' do
+    # NOTE: It is important that this happens *after* the conditional inclusion of
+    # the travis_build_environment::hhvm recipe just above so that the default php
+    # version is not hhvm.
+    code "phpenv global #{node['travis_build_environment']['php_default_version']}"
+    user node['travis_build_environment']['user']
+    group node['travis_build_environment']['group']
+    flags '-l'
+    environment('HOME' => node['travis_build_environment']['home'])
+    not_if { Array(node['travis_build_environment']['php_versions']).empty? }
+  end
+end
 
 bash 'remove ~travis/.pearrc' do
   code "rm -f #{node['travis_build_environment']['home']}/.pearrc"
@@ -316,9 +340,10 @@ directory ::File.dirname(nvm_sh) do
   mode 0o750
 end
 
+nvm_url = obtain_nvm_url
+
 remote_file nvm_sh do
-  source node['travis_build_environment']['nvm']['url']
-  checksum node['travis_build_environment']['nvm']['sha256sum']
+  source nvm_url
   owner node['travis_build_environment']['user']
   group node['travis_build_environment']['user']
   mode 0o750

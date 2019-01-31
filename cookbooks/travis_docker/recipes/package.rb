@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Cookbook Name:: travis_docker
 # Recipe:: package
 # Copyright 2017 Travis CI GmbH
@@ -55,4 +57,9 @@ cookbook_file '/etc/docker/daemon.json' do
   owner 'root'
   group 'root'
   mode 0o640
+end
+
+apt_repository 'docker' do
+  action :remove
+  not_if { node['travis_build_environment']['docker']['keep_repo'] }
 end
