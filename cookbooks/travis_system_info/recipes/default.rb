@@ -40,8 +40,14 @@ end
 
 if node['kernel']['machine'] == 's390x'
   
+  directory "/opt/chef/embedded/bin" do
+    owner node['travis_build_environment']['user']
+    group node['travis_build_environment']['group']
+    recursive true
+  end
+
   link "/opt/chef/embedded/bin/system-info" do
-    to "#{gem_bin_path}/system-info "
+    to "#{gem_bin_path}/system-info"
     owner node['travis_build_environment']['user']
     group node['travis_build_environment']['group']
   end
