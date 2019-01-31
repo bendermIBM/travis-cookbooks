@@ -254,7 +254,7 @@ bash "set default elixir version to #{node['travis_build_environment']['default_
   not_if { node['travis_build_environment']['default_elixir_version'].empty? }
 end
 
-if node['kernel']['machine'] != 's390x':
+if node['kernel']['machine'] != 's390x'
   unless Array(node['travis_build_environment']['php_packages']).empty?
     package Array(node['travis_build_environment']['php_packages'])
   end
