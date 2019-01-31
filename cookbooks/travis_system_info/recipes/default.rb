@@ -15,15 +15,20 @@ remote_file local_gem do
   checksum node['travis_system_info']['gem_sha256sum']
 end
 
-gem_path = nil
+gem_executable_path = nil
+gem_bin_path = nil
 
+# s390x workaround to use default ruby instead of embedded chef gem
 if node['kernel']['machine'] == 's390x'
-  gem_path = "#{node['travis_build_environment']['home']}/.rvm/rubies/ruby-#{node['travis_build_environment']['default_ruby']}/bin/gem"
+  ruby_base_path = "#{node['travis_build_environment']['home']}/.rvm"
+  gem_executable_path = "#{ruby_base_path}/rubies/ruby-#{node['travis_build_environment']['default_ruby']}/bin/gem"
+  gem_bin_path = "#{ruby_base_path}/gems/ruby-#{node['travis_build_environment']['default_ruby']}/bin"
 else
-  gem_path = "/opt/chef/embedded/bin/gem"
+  gem_executable_path = "/opt/chef/embedded/bin/gem"
+  gem_bin_path = "/opt/chef/embedded/bin/"
 end
 
-execute "#{gem_path} install -b #{local_gem.inspect}"
+execute "#{gem_executable_path} install -b #{local_gem.inspect}"
 
 execute "rm -rf #{node['travis_system_info']['dest_dir']}"
 
@@ -35,7 +40,7 @@ end
 
 ruby_block 'generate system-info report' do
   block do
-    exec = Chef::Resource::Execute.new('system-info report', run_context)
+    exec = Chef::Resource::Execute.new("#{gem_bin_path}/system-info report", run_context)
     exec.command(
       SystemInfoMethods.system_info_command(
         user: node['travis_build_environment']['user'],
