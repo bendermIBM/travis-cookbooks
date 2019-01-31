@@ -22,12 +22,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-ark 'packer' do
-  arch = node['kernel']['machine'].gsub(/x86_64/, 'amd64')
-  version node['travis_build_environment']['packer'][arch]['version']
-  checksum node['travis_build_environment']['packer'][arch]['checksum']
-  url "https://releases.hashicorp.com/packer/#{version}/packer_#{version}_linux_#{arch}.zip"
-  strip_components 0
-  has_binaries node['travis_build_environment']['packer_binaries']
-  not_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'}
+if !=  node['kernel']['machine'] == 's390x'
+  ark 'packer' do
+    arch = node['kernel']['machine'].gsub(/x86_64/, 'amd64')
+    version node['travis_build_environment']['packer'][arch]['version']
+    checksum node['travis_build_environment']['packer'][arch]['checksum']
+    url "https://releases.hashicorp.com/packer/#{version}/packer_#{version}_linux_#{arch}.zip"
+    strip_components 0
+    has_binaries node['travis_build_environment']['packer_binaries']
+    not_if { node['kernel']['machine'] == 'ppc64le' || node['kernel']['machine'] == 's390x'}
+  end
 end
