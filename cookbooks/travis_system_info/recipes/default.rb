@@ -15,7 +15,11 @@ remote_file local_gem do
   checksum node['travis_system_info']['gem_sha256sum']
 end
 
-execute "/opt/chef/embedded/bin/gem install -b #{local_gem.inspect}"
+if node['kernel']['machine'] == 's390x'
+  execute "/usr/local/bin/gem install -b #{local_gem.inspect}"
+else
+  execute "/opt/chef/embedded/bin/gem install -b #{local_gem.inspect}"
+end
 
 execute "rm -rf #{node['travis_system_info']['dest_dir']}"
 
