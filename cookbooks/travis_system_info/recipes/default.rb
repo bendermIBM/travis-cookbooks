@@ -15,11 +15,15 @@ remote_file local_gem do
   checksum node['travis_system_info']['gem_sha256sum']
 end
 
+gem_path = nil
+
 if node['kernel']['machine'] == 's390x'
-  execute "/usr/local/bin/gem install -b #{local_gem.inspect}"
+  gem_path = "#{node['travis_build_environment']['home']}/.rvm/rubies/ruby-#{node['travis_build_environment']['default_ruby']}/bin/gem"
 else
-  execute "/opt/chef/embedded/bin/gem install -b #{local_gem.inspect}"
+  gem_path = "/opt/chef/embedded/bin/gem"
 end
+
+execute "#{gem_path} install -b #{local_gem.inspect}"
 
 execute "rm -rf #{node['travis_system_info']['dest_dir']}"
 
