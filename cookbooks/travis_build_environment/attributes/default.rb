@@ -118,27 +118,12 @@ default['travis_build_environment']['elixir_versions'] = %w[
 default['travis_build_environment']['required_otp_release_for']['1.7.4'] = '21.1'
 default['travis_build_environment']['default_elixir_version'] = '1.7.4'
 default['travis_build_environment']['mysql']['socket'] = '/var/run/mysqld/mysqld.sock'
-<<<<<<< HEAD
-default['travis_build_environment']['packer_url'] = \
-  'https://releases.hashicorp.com/packer/1.0.2/packer_1.0.2_linux_amd64.zip'
-default['travis_build_environment']['packer_checksum'] = \
-  '13774108d10e26b1b26cc5a0a28e26c934b4e2c66bc3e6c33ea04c2f248aad7f'
-default['travis_build_environment']['packer_version'] = '1.0.2'
-if node['kernel']['machine'] == 'ppc64le'
-  default['travis_build_environment']['packer_version'] = '1.1.3'
-  default['travis_build_environment']['packer_url'] = \
-   'https://releases.hashicorp.com/packer/1.1.3/packer_1.1.3_linux_ppc64le.zip'
-  default['travis_build_environment']['packer_checksum'] = \
-   '25ecb9b4592924c9d04ef2cb3796690827e559e24789efacefc58f795676d329'
-end
-=======
 default['travis_build_environment']['packer']['amd64']['version'] = '1.3.3'
 default['travis_build_environment']['packer']['amd64']['checksum'] = \
   '2e3ea8f366d676d6572ead7e0c773158dfea0aed9c6a740c669d447bcb48d65f'
 default['travis_build_environment']['packer']['ppc64le']['version'] = '1.3.3'
 default['travis_build_environment']['packer']['ppc64le']['checksum'] = \
   '4b8bc93a2bf406fb035968815c680f171830ff7246de9594c08a15ac0c9a18d8'
->>>>>>> 5a634d9e3cba098f817686c3fc0cfe207e88bb54
 default['travis_build_environment']['packer_binaries'] = %w[packer]
 default['travis_build_environment']['ramfs_dir'] = '/var/ramfs'
 default['travis_build_environment']['ramfs_size'] = '768m'
@@ -254,11 +239,6 @@ default['travis_build_environment']['sysctl_kernel_shmmax'] = 45_794_432
 default['travis_build_environment']['sysctl_disable_ipv6'] = true
 default['travis_build_environment']['sysctl_enable_ipv4_forwarding'] = true
 
-<<<<<<< HEAD
-default['travis_build_environment']['maven_url'] = 'http://ftp.unicamp.br/pub/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz'
-default['travis_build_environment']['maven_version'] = '3.5.4'
-#default['travis_build_environment']['maven_checksum'] = '2a803f578f341e164f6753e410413d16ab60fabe31dc491d1fe35c984a5cce696bc71f57757d4538fe7738be04065a216f3ebad4ef7e0ce1bb4c51bc36d6be86'
-=======
 maven_version = '3.6.0'
 default['travis_build_environment']['maven_version'] = maven_version
 default['travis_build_environment']['maven_url'] = [
@@ -269,7 +249,6 @@ default['travis_build_environment']['maven_url'] = [
   '-bin.tar.gz'
 ].join('')
 default['travis_build_environment']['maven_checksum'] = '6a1b346af36a1f1a491c1c1a141667c5de69b42e6611d3687df26868bc0f4637'
->>>>>>> 5a634d9e3cba098f817686c3fc0cfe207e88bb54
 
 default['travis_build_environment']['neo4j']['service_enabled'] = false
 default['travis_build_environment']['neo4j']['jvm_heap'] = '128m'
