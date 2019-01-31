@@ -22,7 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-if !=  node['kernel']['machine'] == 's390x'
+if node['kernel']['machine'] != 's390x'
   ark 'packer' do
     arch = node['kernel']['machine'].gsub(/x86_64/, 'amd64')
     version node['travis_build_environment']['packer'][arch]['version']
