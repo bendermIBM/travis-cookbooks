@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-default['travis_postgresql']['default_version'] = '9.5'
-default['travis_postgresql']['alternate_versions'] = %w[9.5]
-=======
 # frozen_string_literal: true
 
 default['travis_postgresql']['default_version'] = '9.2'
 default['travis_postgresql']['alternate_versions'] = %w[9.3 9.4 9.5 9.6]
->>>>>>> 5a634d9e3cba098f817686c3fc0cfe207e88bb54
 
 default['travis_postgresql']['enabled'] = true # is default instance started on machine boot?
 
