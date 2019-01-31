@@ -38,6 +38,15 @@ directory node['travis_system_info']['dest_dir'] do
   recursive true
 end
 
+if node['kernel']['machine'] == 's390x'
+  
+  link "/opt/chef/embedded/bin/system-info" do
+    to "#{gem_bin_path}/system-info "
+    owner node['travis_build_environment']['user']
+    group node['travis_build_environment']['group']
+  end
+end
+
 ruby_block 'generate system-info report' do
   block do
     exec = Chef::Resource::Execute.new("#{gem_bin_path}/system-info report", run_context)
