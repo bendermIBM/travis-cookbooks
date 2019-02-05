@@ -22,7 +22,7 @@ gem_bin_path = nil
 if node['kernel']['machine'] == 's390x'
   ruby_base_path = "#{node['travis_build_environment']['home']}/.rvm"
   gem_executable_path = "#{ruby_base_path}/rubies/ruby-#{node['travis_build_environment']['default_ruby']}/bin/gem"
-  gem_bin_path = "#{ruby_base_path}/gems/ruby-#{node['travis_build_environment']['default_ruby']}/bin"
+  gem_bin_path = "#{ruby_base_path}/wrappers/ruby-#{node['travis_build_environment']['default_ruby']}/bin"
 else
   gem_executable_path = "/opt/chef/embedded/bin/gem"
   gem_bin_path = "/opt/chef/embedded/bin/"
