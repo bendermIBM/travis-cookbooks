@@ -3,12 +3,12 @@
 module SystemInfoMethods
   class << self
     def system_info_command(options = {})
-      "#{system_info_exe} report #{system_info_options(options)}"
+      "#{system_info_exe(options)} report #{system_info_options(options)}"
     end
 
     private
 
-    def system_info_exe
+    def system_info_exe(options)
       gem_bin_path = options.fetch(:gem_bin_path, '')
 
       if gem_bin_path.nil?
