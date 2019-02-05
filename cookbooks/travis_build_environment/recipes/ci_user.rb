@@ -28,15 +28,20 @@ require 'openssl'
 require 'pathname'
 
 def obtain_nvm_url
-  http = Net::HTTP.new('api.github.com', 443)
-  http.use_ssl = true
-  http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-  request = Net::HTTP::Get.new('/repos/creationix/nvm/releases/latest')
-  request['Accept'] = 'application/json'
-  token = node&.[]('travis_packer_build')&.[]('github_token')
-  request['Authorization'] = "token #{token}" if token
-  response = http.request(request)
-  tag = JSON.parse(response.body).fetch('tag_name')
+  tag = nil
+  if node['kernel']['machine'] == 's390x'
+    tag = "v0.34.0"
+  else
+    http = Net::HTTP.new('api.github.com', 443)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    request = Net::HTTP::Get.new('/repos/creationix/nvm/releases/latest')
+    request['Accept'] = 'application/json'
+    token = node&.[]('travis_packer_build')&.[]('github_token')
+    request['Authorization'] = "token #{token}" if token
+    response = http.request(request)
+    tag = JSON.parse(response.body).fetch('tag_name')
+  end
   "https://raw.githubusercontent.com/creationix/nvm/#{tag}/nvm.sh"
 end
 
