@@ -9,11 +9,14 @@ module SystemInfoMethods
     private
 
     def system_info_exe
-      if node['kernel']['machine'] == 's390x'
-        "#{node['travis_build_environment']['home']}/.rvm/gems/ruby-#{node['travis_build_environment']['default_ruby']}/bin/system-info"
-      else
+      gem_bin_path = options.fetch(:gem_bin_path, '')
+
+      if gem_bin_path.nil?
         '/opt/chef/embedded/bin/system-info'
+      else
+        "#{gem_bin_path}/system-info"
       end
+      
     end
 
     def system_info_options(options)

@@ -58,15 +58,29 @@ end
 # else
 ruby_block 'generate system-info report' do
   block do
-    exec = Chef::Resource::Execute.new("#{gem_bin_path}/system-info report", run_context)
-    exec.command(
-      SystemInfoMethods.system_info_command(
-        user: node['travis_build_environment']['user'],
-        dest_dir: node['travis_system_info']['dest_dir'],
-        commands_file: node['travis_system_info']['commands_file'],
-        cookbooks_sha: node['travis_system_info']['cookbooks_sha']
+    exec = Chef::Resource::Execute.new("system-info report", run_context)
+
+    if node['kernel']['machine'] == 's390x'
+      exec.command(
+        SystemInfoMethods.system_info_command(
+          user: node['travis_build_environment']['user'],
+          dest_dir: node['travis_system_info']['dest_dir'],
+          commands_file: node['travis_system_info']['commands_file'],
+          cookbooks_sha: node['travis_system_info']['cookbooks_sha'],
+          gem_bin_path: gem_bin_path
+        )
       )
-    )
+    else
+      exec.command(
+        SystemInfoMethods.system_info_command(
+          user: node['travis_build_environment']['user'],
+          dest_dir: node['travis_system_info']['dest_dir'],
+          commands_file: node['travis_system_info']['commands_file'],
+          cookbooks_sha: node['travis_system_info']['cookbooks_sha']
+        )
+      )
+    end
+      
     exec.environment('HOME' => node['travis_build_environment']['home'])
     exec.run_action(:run)
   end
