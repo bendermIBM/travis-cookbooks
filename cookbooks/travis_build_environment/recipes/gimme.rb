@@ -33,7 +33,12 @@ def obtain_gimme_url
   token = node&.[]('travis_packer_build')&.[]('github_token')
   request['Authorization'] = "token #{token}" if token
   response = http.request(request)
-  tag = JSON.parse(response.body).fetch('tag_name')
+
+  if node['kernel']['machine'] == 's390x'
+    tag = "v1.5.3"
+  else
+    tag = JSON.parse(response.body).fetch('tag_name')
+  end
   "https://raw.githubusercontent.com/travis-ci/gimme/#{tag}/gimme"
 end
 
