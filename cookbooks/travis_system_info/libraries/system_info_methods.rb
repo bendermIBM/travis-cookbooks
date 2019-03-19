@@ -9,9 +9,9 @@ module SystemInfoMethods
     private
 
     def system_info_exe(options)
-      gem_bin_path = options.fetch(:gem_bin_path, '')
+      gem_bin_path = options.fetch(:gem_bin_path, 'no_path')
 
-      if gem_bin_path.nil?
+      if gem_bin_path == 'no_path'
         '/opt/chef/embedded/bin/system-info'
       else
         "#{gem_bin_path}/system-info"

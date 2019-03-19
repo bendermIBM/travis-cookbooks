@@ -67,7 +67,7 @@ ruby_block 'generate system-info report' do
           dest_dir: node['travis_system_info']['dest_dir'],
           commands_file: node['travis_system_info']['commands_file'],
           cookbooks_sha: node['travis_system_info']['cookbooks_sha'],
-          gem_bin_path: gem_bin_path
+          gem_bin_path: '/usr/local/bin/system-info'
         )
       )
     else
